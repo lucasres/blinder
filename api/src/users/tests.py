@@ -1,14 +1,17 @@
 from django.test import TestCase
+from django.urls import reverse
 
 from rest_framework import status
 from rest_framework.test import APIClient
-
 from django.contrib.auth import get_user_model
+
+from descriptions.tests import TestDescriptions
 
 User = get_user_model()
 
 
 class RegisterUserTests(TestCase):
+
     invalid_user = {
         'username': 'denis' + 'd' * 150,
         'email': 'denisemailcom',
@@ -31,10 +34,16 @@ class RegisterUserTests(TestCase):
     }
 
     check_fields = ['username', 'email', 'first_name', 'last_name', 'phone']
+    profile = reverse('profile')
     route = '/api/register/'
+    login = '/api/login/'
 
     def setUp(self):
         self.client = APIClient()
+
+    def create_valid_user(self):
+        user_test = User.objects.create_user(**self.simple_valid_user)
+        return user_test
 
     def test_not_allowed_methods(self):
         response = self.client.get(self.route)
@@ -102,3 +111,26 @@ class RegisterUserTests(TestCase):
 
             db_users = User.objects.count()
             self.assertEqual(2, db_users)
+
+    def test_invalid_login(self):
+        data = self.simple_valid_user
+        response = self.client.post(self.login, data=data, format='json')
+        with self.subTest('Username and/or password must be valid', response=response):
+            self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_valid_login(self):
+        data = self.simple_valid_user
+        self.client.post(self.route, data=data, format='json')
+        response = self.client.post(self.login, data=data, format='json')
+        with self.subTest('Username and/or password must be valid', response=response):
+            self.assertEqual(response.status_code, status.HTTP_200_OK)
+            self.assertIn('token', response.json())
+
+    def test_profile_retrieve(self):
+        user_test = self.create_valid_user()
+        self.client.force_authenticate(user_test)
+        response = self.client.get(self.profile, format='json')
+        with self.subTest('Authentication credentials must be provided', response=response):
+            self.assertEqual(response.status_code, status.HTTP_200_OK)
+            self.assertIn('name', response.json())
+            self.assertIn('descriptions', response.json())
