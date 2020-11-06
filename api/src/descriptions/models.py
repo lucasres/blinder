@@ -6,4 +6,4 @@ class Description(models.Model):
     title = models.CharField(max_length=150,null=False,blank=False)
     description = models.TextField(null=False, blank=False)
     emoji = models.CharField(max_length=150,null=True, blank=True)
-    user = models.ForeignKey(to=User, on_delete=models.PROTECT)
+    user = models.ForeignKey(to=User, on_delete=models.PROTECT, related_name="descriptions")
