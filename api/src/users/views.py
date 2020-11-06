@@ -5,6 +5,7 @@ from users.serializers import RegisterSerializer
 
 class RegisterAPIView(generics.CreateAPIView):
     serializer_class = RegisterSerializer
+    permission_classes = (permissions.AllowAny, )
 
 class WelcomeView(generics.GenericAPIView):
 	permission_classes = (permissions.AllowAny, )
