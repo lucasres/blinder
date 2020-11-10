@@ -3,6 +3,9 @@ from django.contrib.auth.password_validation import validate_password
 
 from rest_framework import serializers
 
+from descriptions.serializers import CreateDescriptionSerializer
+from descriptions.models import Description
+
 User = get_user_model()
 
 
@@ -31,3 +34,20 @@ class RegisterSerializer(serializers.ModelSerializer):
         user.set_password(validated_data.get('password'))
         user.save()
         return user
+
+class ProfileUserSerializer(serializers.ModelSerializer):
+    name = serializers.SerializerMethodField()
+    descriptions = serializers.SerializerMethodField()
+    class Meta:
+        model = User
+        fields = [
+            'id', 'name', 'descriptions',
+        ]
+
+    def get_descriptions(self, obj):
+        ds = Description.objects.filter(user=obj)
+        serializer = CreateDescriptionSerializer(ds, many=True)
+        return serializer.data
+
+    def get_name(self, obj):
+        return "{} {}".format(obj.first_name, obj.last_name)

@@ -16,15 +16,15 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 
-from rest_framework_jwt.views import obtain_jwt_token
-
-from users.views import register, hello
+from users.views import register, hello, profile
 from descriptions.views import create_description
 
+from rest_framework_jwt.views import obtain_jwt_token
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('',hello,name='hello'),
     path('api/register/', register, name='register'),
     path('api/descriptions', create_description, name='descriptions.create'),
+    path('api/user/profile', profile, name='profile'),
     path('api/login/', obtain_jwt_token, name='login'),
 ]

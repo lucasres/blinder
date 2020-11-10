@@ -7,7 +7,7 @@ from rest_framework.permissions import IsAuthenticated
 # Create your views here.
 class CreateDescriptionView(generics.CreateAPIView):
     serializer_class = CreateDescriptionSerializer
-    authentication_classes = [BasicAuthentication,]
     permission_classes = [IsAuthenticated,]
+    #authentication_classes = [BasicAuthentication,]
 
 create_description = CreateDescriptionView.as_view()
