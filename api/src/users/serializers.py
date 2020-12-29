@@ -5,6 +5,7 @@ from rest_framework import serializers
 
 from descriptions.serializers import CreateDescriptionSerializer
 from descriptions.models import Description
+from rest_framework_jwt.settings import api_settings
 
 User = get_user_model()
 
@@ -27,6 +28,11 @@ class RegisterSerializer(serializers.ModelSerializer):
         rep = super().to_representation(instance)
         if 'password' in rep:
             del rep['password']
+        #retorna o token de acesso do usuario cadastrado
+
+        payload = api_settings.JWT_PAYLOAD_HANDLER(instance)
+        token = api_settings.JWT_ENCODE_HANDLER(payload)
+        rep['acess_token'] = token
         return rep
 
     def create(self, validated_data):
